@@ -20,6 +20,7 @@ class FirstRouterPage(TextPage):
     Utilizada para extrair do HTML informações que serão necessárias nas
     próximas requisições.
     """
+
     @property
     def auth_token(self):
         """
@@ -55,6 +56,7 @@ class SecondRouterPage(TextPage):
     Também utilizada para extrair do HTML informações que serão necessárias nas
     próximas requisições.
     """
+
     @property
     def op_sign_command(self):
         return re.search('__opSignCommand = "(.*?)";', self._text).group(1)
@@ -77,6 +79,7 @@ class PasswordPage(SoupPage):
     Por baixo dos panos cada botão representa uma letra.
     A combinação das letras deve ser enviada na próxima requisição.
     """
+
     @property
     def op(self):
         """
@@ -120,9 +123,20 @@ class AuthenticatedHomePage(SoupPage):
     """
     Primeira página após o login
     """
+
     @property
     def op(self):
         return self._soup.find('div', class_='logo left').find('a').attrs['data-op']
+
+    @property
+    def dropdown_menu_op(self):
+        expression = r'var\s?obterMenu\s?=\s?function\s?\(\)\s?{[\n\r\t\s+]' \
+                     r'+var\s?perfil\s?=\s?\$\("#portalTxt"\)\.val\(\);[\n' \
+                     r'\t\r\s]+\$\.ajax\(\{[\n\t\r\s]+url\s?:\s?"([^"]+)'
+        return re.search(expression,
+                         self._text,
+                         flags=re.DOTALL,
+                         ).group(1)
 
 
 class MenuPage(TextPage):
@@ -141,6 +155,16 @@ class MenuPage(TextPage):
             self._text,
             flags=re.DOTALL,
         ).group(1)
+
+    @property
+    def dropdown_menu_op(self):
+        expression = r'var\s?obterMenu\s?=\s?function\s?\(\)\s?{[\n\r\t\s+]' \
+                     r'+var\s?perfil\s?=\s?\$\("#portalTxt"\)\.val\(\);[\n' \
+                     r'\t\r\s]+\$\.ajax\(\{[\n\t\r\s]+url\s?:\s?"([^"]+)'
+        return re.search(expression,
+                         self._text,
+                         flags=re.DOTALL,
+                         ).group(1)
 
 
 class CheckingAccountMenu(TextPage):
@@ -163,6 +187,12 @@ class CheckingCardsMenu(TextPage):
         ).group(1)
 
 
+class DropdownMenu(SoupPage):
+    @property
+    def bill_and_limit_op(self):
+        return self._soup.find('a', text=re.compile('fatura e limite')).attrs['data-op']
+
+
 class CheckingAccountStatementsPage(SoupPage):
     @property
     def full_statement_op(self):
@@ -177,8 +207,10 @@ class CardsPage(SoupPage):
 
     @property
     def first_card_id(self):
-        form_invoice = self._soup.find('form', id='formVerFaturaRedesenho')
-        return form_invoice.find('input', {'name': 'idCartao'}).attrs['value']
+        return re.search(
+            r"href=\"javascript:verFaturaRedesenho\('([^']+)'",
+            self._text,
+            flags=re.DOTALL).group(1)
 
 
 class CheckingAccountFullStatement(TextPage):
