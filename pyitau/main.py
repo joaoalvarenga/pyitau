@@ -48,7 +48,7 @@ class Itau:
                                                            login_button_xpath)
             agency_el.send_keys(self.agency)
             account_el.send_keys(f'{self.account}{self.account_digit}')
-            login_button_el.click()
+            self.__close_popup_and_click(login_button_el)
             print('Authenticating with password')
             keyboard = WebDriverWait(self._webdriver, 30).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'teclado'))
@@ -61,9 +61,9 @@ class Itau:
                 mapper[numbers[0]] = key_el
                 mapper[numbers[1]] = key_el
             for letter in self.password:
-                mapper[letter].click()
+                self.__close_popup_and_click(mapper[letter])
             login_button_el = self._webdriver.find_element(By.ID, 'acessar')
-            login_button_el.click()
+            self.__close_popup_and_click(login_button_el)
             print('Authentication complete')
             return
 
@@ -138,7 +138,7 @@ class Itau:
             card_data = json.loads(card_details_request.response.body)
             output[card_data['object']['data'][card_i]['numero']] = card_data
             home_el = self._webdriver.find_element(By.XPATH, '//a[@title="Home"]')
-            home_el.click()
+            self.__close_popup_and_click(home_el)
             self._load_cards()
         return output
 
