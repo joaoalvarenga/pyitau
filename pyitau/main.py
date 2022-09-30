@@ -1,6 +1,7 @@
 import json
 
 import requests
+from selenium.common import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -129,11 +130,13 @@ class Itau:
                                                       '//a[@title="ver fatura cartão"]')
             self.__close_popup_and_click(all_cards[card_i])
             print(f'Going to #{card_i} card details')
-
-            WebDriverWait(self._webdriver, 30).until(
-                EC.element_to_be_clickable((By.XPATH,
-                                            "//button[contains(@aria-label, 'imprimir')]"))
-            )
+            try:
+                WebDriverWait(self._webdriver, 30).until(
+                    EC.element_to_be_clickable((By.XPATH,
+                                                "//button[contains(@aria-label, 'imprimir')]"))
+                )
+            except TimeoutException:
+                pass
             card_details_request = []
             for r in self._webdriver.requests[::-1]:
                 if r.url.endswith('/router') and r.params.get('secao') == 'Cartoes:MinhaFatura':
