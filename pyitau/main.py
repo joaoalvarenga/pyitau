@@ -137,6 +137,7 @@ class Itau:
                 )
             except TimeoutException:
                 pass
+            print(self._webdriver.page_source)
             card_details_request = []
             for r in self._webdriver.requests[::-1]:
                 if r.url.endswith('/router') and r.params.get('secao') == 'Cartoes:MinhaFatura':
