@@ -53,8 +53,8 @@ class Itau:
             keyboard = WebDriverWait(self._webdriver, 30).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'teclado'))
             )
-            keys = keyboard.find_element_by_class_name('teclas')
-            all_keys_el = keys.find_elements_by_class_name('campoTeclado')
+            keys = keyboard.find_element(By.CLASS_NAME, 'teclas')
+            all_keys_el = keys.find_elements(By.CLASS_NAME, 'campoTeclado')
             mapper = {}
             for key_el in all_keys_el:
                 numbers = key_el.get_attribute('aria-label').split(' ou ')
@@ -81,7 +81,8 @@ class Itau:
             return WebDriverWait(self._webdriver, timeout).until(condition)
         except Exception:
             actions = ActionChains(self._webdriver)
-            actions.move_to_location(0, 0).click().perform()
+            actions.w3c_actions.pointer_action.move_to_location(0, 0)
+            actions.click().perform()
             return WebDriverWait(self._webdriver, timeout).until(condition)
 
     def __close_popup_and_click(self, element):
@@ -89,7 +90,10 @@ class Itau:
             element.click()
         except Exception:
             actions = ActionChains(self._webdriver)
-            actions.move_to_location(0, 0).click().click().click().click().perform()
+            actions.w3c_actions.pointer_action.move_to_location(0, 0)
+            actions.click().click().click().click()
+
+            actions.perform()
             self.__close_popup_and_click(element)
 
     def _load_cards(self):
