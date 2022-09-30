@@ -130,6 +130,8 @@ class Itau:
                                                       '//a[@title="ver fatura cartão"]')
             self.__close_popup_and_click(all_cards[card_i])
             print(f'Going to #{card_i} card details')
+
+            print(self._webdriver.page_source)
             try:
                 WebDriverWait(self._webdriver, 30).until(
                     EC.element_to_be_clickable((By.XPATH,
@@ -137,7 +139,6 @@ class Itau:
                 )
             except TimeoutException:
                 pass
-            print(self._webdriver.page_source)
             card_details_request = []
             for r in self._webdriver.requests[::-1]:
                 if r.url.endswith('/router') and r.params.get('secao') == 'Cartoes:MinhaFatura':
