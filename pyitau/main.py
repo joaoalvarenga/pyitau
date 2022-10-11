@@ -8,10 +8,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from pyitau.pages import (CardDetails, CardsPage, CheckingAccountFullStatement,
-                          CheckingAccountMenu, CheckingAccountStatementsPage,
-                          DropdownMenu, FirstRouterPage, MenuPage,
-                          PasswordPage, SecondRouterPage)
+from pyitau.pages import (AuthenticatedHomePage, CardDetails, CardsPage,
+                          CheckingAccountFullStatement, CheckingAccountMenu,
+                          CheckingAccountStatementsPage, DropdownMenu,
+                          FirstRouterPage, MenuPage, PasswordPage,
+                          SecondRouterPage)
 
 ROUTER_URL = 'https://internetpf5.itau.com.br/router-app/router'
 
@@ -130,8 +131,6 @@ class Itau:
                                                       '//a[@title="ver fatura cartão"]')
             self.__close_popup_and_click(all_cards[card_i])
             print(f'Going to #{card_i} card details')
-
-            print(self._webdriver.page_source)
             try:
                 WebDriverWait(self._webdriver, 30).until(
                     EC.element_to_be_clickable((By.XPATH,
@@ -139,6 +138,7 @@ class Itau:
                 )
             except TimeoutException:
                 pass
+            print(self._webdriver.page_source)
             card_details_request = []
             for r in self._webdriver.requests[::-1]:
                 if r.url.endswith('/router') and r.params.get('secao') == 'Cartoes:MinhaFatura':
@@ -272,4 +272,4 @@ class Itau:
         response = self._session.post(ROUTER_URL, headers=headers, data=data)
         if self._webdriver is not None:
             self._webdriver.get("data:text/html;charset=utf-8," + response.text)
-        # self._home = AuthenticatedHomePage(response.text)
+        self._home = AuthenticatedHomePage(response.text)
